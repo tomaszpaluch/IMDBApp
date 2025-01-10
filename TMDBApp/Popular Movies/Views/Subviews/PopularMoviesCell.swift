@@ -22,7 +22,9 @@ struct PopularMoviesCell: View {
                 Text(data.movieTitle)
                     .foregroundStyle(Colors.link)
             }
-            .padding(8)
+        }
+        .onAppear {
+            data.send(.appeared)
         }
     }
 }

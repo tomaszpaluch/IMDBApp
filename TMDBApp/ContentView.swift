@@ -10,7 +10,15 @@ import SwiftUI
 struct ContentView: View {
     var body: some View {
         NavigationStack {
-            PopularMoviesView()
+            NavigationStack {
+                PopularMoviesView(
+                    viewModel: .init(
+                        popularMoviesPagination: PopularMoviesPagination(
+                            service: PopularMoviesAPIService()
+                        )
+                    )
+                )
+            }
         }
     }
 }

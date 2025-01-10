@@ -5,4 +5,9 @@
 //  Created by Tomasz Paluch on 10/01/2025.
 //
 
-import Foundation
+struct PaginatedResponse<T: Decodable>: Decodable {
+    let results: [T]?
+    let totalResults: Int?
+    let page: Int?
+    let totalPages: Int?
+}

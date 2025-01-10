@@ -8,28 +8,50 @@
 import SwiftUI
 
 struct PopularMoviesView: View {
-    private var popularMovies = [
-        PopularMoviesData(id: 1, posterImage: nil, movieTitle: "Star Wars"),
-        PopularMoviesData(id: 2, favoriteButtonData: .init(isFavorite: true), posterImage: nil, movieTitle: "Star Trek"),
-        PopularMoviesData(id: 3, posterImage: nil, movieTitle: "Back To The Future")
-    ]
+    @ObservedObject var viewModel: PopularMoviesViewModel
     
     @State private var searchText = ""
+    private var viewData: PopularMoviesViewData { viewModel.output.viewData }
     
     var body: some View {
         List {
-            ForEach(popularMovies) { movieData in
+            ForEach(viewData.items) { movieData in
                 PopularMoviesCell(data: movieData)
+            }
+        }
+        .listStyle(.plain)
+        .overlay {
+            if viewData.isLoading {
+                Color.white
+                    .opacity(0.8)
+                    .ignoresSafeArea()
+                    .overlay {
+                        ProgressView()
+                            .controlSize(.large)
+                    }
             }
         }
         .navigationTitle(Texts.PopularMovies.title)
         .navigationBarItems(trailing: FavoriteButton(data: .init(isFavorite: false)))
         .searchable(text: $searchText, prompt: Texts.PopularMovies.searchPrompt)
+        .alert(isPresented: .init { viewData.errorMessage != nil } set: { _ in }) {
+            Alert(
+                title: Text("Wystąpił błąd"),
+                message:  viewData.errorMessage.map { Text($0) },
+                dismissButton: .default(Text("OK"))
+            )
+        }
     }
 }
 
 #Preview {
     NavigationStack {
-        PopularMoviesView()
+        PopularMoviesView(
+            viewModel: .init(
+                popularMoviesPagination: PopularMoviesPagination(
+                    service: PopularMoviesApiMock()
+                )
+            )
+        )
     }
 }
