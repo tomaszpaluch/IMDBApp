@@ -32,14 +32,19 @@ class PopularMoviesLogic {
     }
     
     private let popularMoviesPagination: PopularMoviesPaginationable
+    private let favoriteMoviesPersistence: FavoriteMoviesPersistenceable?
     private var storage: Storage
     
     private let eventRelay: PassthroughSubject<Output, ApiError>
     var events: AnyPublisher<Output, ApiError> { eventRelay.eraseToAnyPublisher() }
     private var subscriptions: Set<AnyCancellable>
     
-    init(popularMoviesPagination: PopularMoviesPaginationable) {
+    init(
+        popularMoviesPagination: PopularMoviesPaginationable,
+        favoriteMoviesPersistence: FavoriteMoviesPersistenceable?
+    ) {
         self.popularMoviesPagination = popularMoviesPagination
+        self.favoriteMoviesPersistence = favoriteMoviesPersistence
         self.storage = Storage()
         
         subscriptions = []
@@ -63,6 +68,13 @@ class PopularMoviesLogic {
     }
     
     private func setData(_ items: [PopularMoviesCellData]) {
+        let items = favoriteMoviesPersistence.map { persistence in
+            items.map {
+                var copy = $0
+                copy.favoriteButtonData.isFavorite =  persistence.isFaved(itemID: $0.id)
+                return copy
+            }
+        } ?? items
         storage.data = items
         eventRelay.send(.addData(items))
     }
@@ -101,6 +113,7 @@ class PopularMoviesLogic {
             movieTitle: oldData.movieTitle
         )
         
+        favoriteMoviesPersistence?.saveFav(for: oldData.id)
         eventRelay.send(.showData(storage.data))
     }
 

@@ -29,7 +29,7 @@ struct PopularMoviesCellData: Identifiable {
     }
     
     let id: Int
-    let favoriteButtonData: FavoriteButtonData
+    var favoriteButtonData: FavoriteButtonData
     let posterImage: ImageData?
     let movieTitle: String
     

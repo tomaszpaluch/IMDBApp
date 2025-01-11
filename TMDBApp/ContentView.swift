@@ -15,7 +15,8 @@ struct ContentView: View {
                     viewModel: .init(
                         popularMoviesPagination: PopularMoviesPagination(
                             service: PopularMoviesAPIService()
-                        )
+                        ),
+                        favoriteMoviesPersistence: FavoriteMoviesPersistence()
                     )
                 )
             }

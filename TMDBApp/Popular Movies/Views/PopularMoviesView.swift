@@ -50,7 +50,8 @@ struct PopularMoviesView: View {
             viewModel: .init(
                 popularMoviesPagination: PopularMoviesPagination(
                     service: PopularMoviesApiMock()
-                )
+                ),
+                favoriteMoviesPersistence: FavoriteMoviesPersistence()
             )
         )
     }

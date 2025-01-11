@@ -32,8 +32,14 @@ class PopularMoviesViewModel: ObservableObject {
     private var subscriptions: Set<AnyCancellable>
     private var viewDataSubscription: AnyCancellable?
     
-    init(popularMoviesPagination: PopularMoviesPaginationable) {
-        self.logic = PopularMoviesLogic(popularMoviesPagination: popularMoviesPagination)
+    init(
+        popularMoviesPagination: PopularMoviesPaginationable,
+        favoriteMoviesPersistence: FavoriteMoviesPersistenceable?
+    ) {
+        self.logic = PopularMoviesLogic(
+            popularMoviesPagination: popularMoviesPagination,
+            favoriteMoviesPersistence: favoriteMoviesPersistence
+        )
         
         output = Output()
         subscriptions = []
