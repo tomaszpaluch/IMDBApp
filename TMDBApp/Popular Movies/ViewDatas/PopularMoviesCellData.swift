@@ -8,7 +8,7 @@
 import Foundation
 import Combine
 
-struct PopularMoviesData: Identifiable {
+struct PopularMoviesCellData: Identifiable {
     enum Input {
         case appeared
     }
@@ -28,7 +28,7 @@ struct PopularMoviesData: Identifiable {
         }
     }
     
-    let id: UUID
+    let id: Int
     let favoriteButtonData: FavoriteButtonData
     let posterImage: ImageData?
     let movieTitle: String
@@ -37,8 +37,8 @@ struct PopularMoviesData: Identifiable {
     var events: AnyPublisher<Output, Never> { eventRelay.eraseToAnyPublisher() }
     private var subscriptions: Set<AnyCancellable>
     
-    init(favoriteButtonData: FavoriteButtonData = .initial, posterImage: ImageData?, movieTitle: String) {
-        self.id = UUID()
+    init(id: Int, favoriteButtonData: FavoriteButtonData = .initial, posterImage: ImageData?, movieTitle: String) {
+        self.id = id
         self.favoriteButtonData = favoriteButtonData
         self.posterImage = posterImage
         self.movieTitle = movieTitle

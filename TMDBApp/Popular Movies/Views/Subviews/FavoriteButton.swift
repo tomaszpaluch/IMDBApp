@@ -12,7 +12,9 @@ struct FavoriteButton: View {
     
     var body: some View {
         Button {
-            data.send(.changeState)
+            withAnimation {
+                data.send(.changeState)
+            }
         } label: {
             Image(systemName: data.isFavorite ? "star.fill" : "star")
                 .foregroundStyle(data.isFavorite ? Colors.selected : Colors.unselected)

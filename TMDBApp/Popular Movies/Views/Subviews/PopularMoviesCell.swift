@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct PopularMoviesCell: View {
-    let data: PopularMoviesData
+    let data: PopularMoviesCellData
     
     var body: some View {
         Button {

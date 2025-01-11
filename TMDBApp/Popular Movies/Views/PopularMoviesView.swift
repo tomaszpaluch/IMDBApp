@@ -32,7 +32,7 @@ struct PopularMoviesView: View {
             }
         }
         .navigationTitle(Texts.PopularMovies.title)
-        .navigationBarItems(trailing: FavoriteButton(data: .init(isFavorite: false)))
+        .navigationBarItems(trailing: FavoriteButton(data: viewData.favoriteButtonData))
         .searchable(text: $searchText, prompt: Texts.PopularMovies.searchPrompt)
         .alert(isPresented: .init { viewData.errorMessage != nil } set: { _ in }) {
             Alert(

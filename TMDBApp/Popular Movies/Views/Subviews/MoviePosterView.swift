@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct MoviePosterView: View {
-    let data: PopularMoviesData.ImageData?
+    let data: PopularMoviesCellData.ImageData?
     
     var body: some View {
         Rectangle()

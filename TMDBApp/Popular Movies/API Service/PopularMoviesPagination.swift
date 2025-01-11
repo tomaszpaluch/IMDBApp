@@ -16,7 +16,7 @@ protocol PopularMoviesPaginationable {
 
 class PopularMoviesPagination: PopularMoviesPaginationable {
     enum Output {
-        case data([PopularMoviesData])
+        case data([PopularMoviesCellData])
     }
     
     private let service: PopularMoviesApiServiceable
@@ -59,7 +59,7 @@ class PopularMoviesPagination: PopularMoviesPaginationable {
         print("loading finished")
     }
     
-    func finalizePageLoading(items: [PopularMoviesData], totalPageCount: Int) {
+    func finalizePageLoading(items: [PopularMoviesCellData], totalPageCount: Int) {
         eventRelay.send(.data(items))
         hasMorePages = totalPageCount != nextPage
     }

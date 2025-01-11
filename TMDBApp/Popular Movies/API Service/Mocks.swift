@@ -9,21 +9,21 @@ import Foundation
 import Combine
 
 struct PopularMoviesApiDelayedMock: PopularMoviesApiServiceable {
-    func getMovies(for page: Int) -> AnyPublisher<([PopularMoviesData], totalPageCount: Int), ApiError> {
+    func getMovies(for page: Int) -> AnyPublisher<([PopularMoviesCellData], totalPageCount: Int), ApiError> {
         Future { promise in
             DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                 promise(
                     .success(
                         (
                             [
-                                PopularMoviesData(posterImage: nil, movieTitle: "Star Wars"),
-                                PopularMoviesData(favoriteButtonData: .init(isFavorite: true), posterImage: nil, movieTitle: "Star Trek"),
-                                PopularMoviesData(posterImage: nil, movieTitle: "Back To The Future"),
-                                PopularMoviesData(posterImage: nil, movieTitle: "Matrix"),
-                                PopularMoviesData(posterImage: nil, movieTitle: "Robocop"),
-                                PopularMoviesData(posterImage: nil, movieTitle: "Lord of the Rings"),
-                                PopularMoviesData(posterImage: nil, movieTitle: "Mickey 17"),
-                                PopularMoviesData(posterImage: nil, movieTitle: "James Bond"),
+                                PopularMoviesCellData(posterImage: nil, movieTitle: "Star Wars"),
+                                PopularMoviesCellData(favoriteButtonData: .init(isFavorite: true), posterImage: nil, movieTitle: "Star Trek"),
+                                PopularMoviesCellData(posterImage: nil, movieTitle: "Back To The Future"),
+                                PopularMoviesCellData(posterImage: nil, movieTitle: "Matrix"),
+                                PopularMoviesCellData(posterImage: nil, movieTitle: "Robocop"),
+                                PopularMoviesCellData(posterImage: nil, movieTitle: "Lord of the Rings"),
+                                PopularMoviesCellData(posterImage: nil, movieTitle: "Mickey 17"),
+                                PopularMoviesCellData(posterImage: nil, movieTitle: "James Bond"),
                             ],
                             1
                         )
@@ -34,20 +34,20 @@ struct PopularMoviesApiDelayedMock: PopularMoviesApiServiceable {
         .eraseToAnyPublisher()
     }
     
-    func getMovies(for page: Int) -> AnyPublisher<[PopularMoviesData], ApiError> {
+    func getMovies(for page: Int) -> AnyPublisher<[PopularMoviesCellData], ApiError> {
         Future { promise in
             DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                 promise(
                     .success(
                         [
-                            PopularMoviesData(posterImage: nil, movieTitle: "Star Wars"),
-                            PopularMoviesData(favoriteButtonData: .init(isFavorite: true), posterImage: nil, movieTitle: "Star Trek"),
-                            PopularMoviesData(posterImage: nil, movieTitle: "Back To The Future"),
-                            PopularMoviesData(posterImage: nil, movieTitle: "Matrix"),
-                            PopularMoviesData(posterImage: nil, movieTitle: "Robocop"),
-                            PopularMoviesData(posterImage: nil, movieTitle: "Lord of the Rings"),
-                            PopularMoviesData(posterImage: nil, movieTitle: "Mickey 17"),
-                            PopularMoviesData(posterImage: nil, movieTitle: "James Bond"),
+                            PopularMoviesCellData(posterImage: nil, movieTitle: "Star Wars"),
+                            PopularMoviesCellData(favoriteButtonData: .init(isFavorite: true), posterImage: nil, movieTitle: "Star Trek"),
+                            PopularMoviesCellData(posterImage: nil, movieTitle: "Back To The Future"),
+                            PopularMoviesCellData(posterImage: nil, movieTitle: "Matrix"),
+                            PopularMoviesCellData(posterImage: nil, movieTitle: "Robocop"),
+                            PopularMoviesCellData(posterImage: nil, movieTitle: "Lord of the Rings"),
+                            PopularMoviesCellData(posterImage: nil, movieTitle: "Mickey 17"),
+                            PopularMoviesCellData(posterImage: nil, movieTitle: "James Bond"),
                         ]
                     )
                 )
@@ -58,7 +58,7 @@ struct PopularMoviesApiDelayedMock: PopularMoviesApiServiceable {
 }
 
 struct PopularMoviesApiDelayedFailureMock: PopularMoviesApiServiceable {
-    func getMovies(for page: Int) -> AnyPublisher<([PopularMoviesData], totalPageCount: Int), ApiError> {
+    func getMovies(for page: Int) -> AnyPublisher<([PopularMoviesCellData], totalPageCount: Int), ApiError> {
         Future { promise in
             DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                 promise(
@@ -69,7 +69,7 @@ struct PopularMoviesApiDelayedFailureMock: PopularMoviesApiServiceable {
         .eraseToAnyPublisher()
     }
     
-    func getMovies(for page: Int) -> AnyPublisher<[PopularMoviesData], ApiError> {
+    func getMovies(for page: Int) -> AnyPublisher<[PopularMoviesCellData], ApiError> {
         Future { promise in
             DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                 promise(
@@ -82,20 +82,20 @@ struct PopularMoviesApiDelayedFailureMock: PopularMoviesApiServiceable {
 }
 
 struct PopularMoviesApiMock: PopularMoviesApiServiceable {
-    func getMovies(for page: Int) -> AnyPublisher<([PopularMoviesData], totalPageCount: Int), ApiError> {
+    func getMovies(for page: Int) -> AnyPublisher<([PopularMoviesCellData], totalPageCount: Int), ApiError> {
         Future { promise in
             promise(
                 .success(
                     (
                         [
-                            PopularMoviesData(posterImage: nil, movieTitle: "Star Wars"),
-                            PopularMoviesData(favoriteButtonData: .init(isFavorite: true), posterImage: nil, movieTitle: "Star Trek"),
-                            PopularMoviesData(posterImage: nil, movieTitle: "Back To The Future"),
-                            PopularMoviesData(posterImage: nil, movieTitle: "Matrix"),
-                            PopularMoviesData(posterImage: nil, movieTitle: "Robocop"),
-                            PopularMoviesData(posterImage: nil, movieTitle: "Lord of the Rings"),
-                            PopularMoviesData(posterImage: nil, movieTitle: "Mickey 17"),
-                            PopularMoviesData(posterImage: nil, movieTitle: "James Bond"),
+                            PopularMoviesCellData(posterImage: nil, movieTitle: "Star Wars"),
+                            PopularMoviesCellData(favoriteButtonData: .init(isFavorite: true), posterImage: nil, movieTitle: "Star Trek"),
+                            PopularMoviesCellData(posterImage: nil, movieTitle: "Back To The Future"),
+                            PopularMoviesCellData(posterImage: nil, movieTitle: "Matrix"),
+                            PopularMoviesCellData(posterImage: nil, movieTitle: "Robocop"),
+                            PopularMoviesCellData(posterImage: nil, movieTitle: "Lord of the Rings"),
+                            PopularMoviesCellData(posterImage: nil, movieTitle: "Mickey 17"),
+                            PopularMoviesCellData(posterImage: nil, movieTitle: "James Bond"),
                         ],
                         1
                     )
@@ -105,19 +105,19 @@ struct PopularMoviesApiMock: PopularMoviesApiServiceable {
         .eraseToAnyPublisher()
     }
     
-    func getMovies(for page: Int) -> AnyPublisher<[PopularMoviesData], ApiError> {
+    func getMovies(for page: Int) -> AnyPublisher<[PopularMoviesCellData], ApiError> {
         Future { promise in
             promise(
                 .success(
                     [
-                        PopularMoviesData(posterImage: nil, movieTitle: "Star Wars"),
-                        PopularMoviesData(favoriteButtonData: .init(isFavorite: true), posterImage: nil, movieTitle: "Star Trek"),
-                        PopularMoviesData(posterImage: nil, movieTitle: "Back To The Future"),
-                        PopularMoviesData(posterImage: nil, movieTitle: "Matrix"),
-                        PopularMoviesData(posterImage: nil, movieTitle: "Robocop"),
-                        PopularMoviesData(posterImage: nil, movieTitle: "Lord of the Rings"),
-                        PopularMoviesData(posterImage: nil, movieTitle: "Mickey 17"),
-                        PopularMoviesData(posterImage: nil, movieTitle: "James Bond"),
+                        PopularMoviesCellData(posterImage: nil, movieTitle: "Star Wars"),
+                        PopularMoviesCellData(favoriteButtonData: .init(isFavorite: true), posterImage: nil, movieTitle: "Star Trek"),
+                        PopularMoviesCellData(posterImage: nil, movieTitle: "Back To The Future"),
+                        PopularMoviesCellData(posterImage: nil, movieTitle: "Matrix"),
+                        PopularMoviesCellData(posterImage: nil, movieTitle: "Robocop"),
+                        PopularMoviesCellData(posterImage: nil, movieTitle: "Lord of the Rings"),
+                        PopularMoviesCellData(posterImage: nil, movieTitle: "Mickey 17"),
+                        PopularMoviesCellData(posterImage: nil, movieTitle: "James Bond"),
                     ]
                 )
             )
@@ -126,3 +126,9 @@ struct PopularMoviesApiMock: PopularMoviesApiServiceable {
     }
 }
 
+fileprivate extension PopularMoviesCellData {
+    init(favoriteButtonData: FavoriteButtonData = .initial, posterImage: ImageData?, movieTitle: String) {
+        let pseudoUUID = UUID().uuidString.hashValue
+        self.init(id: pseudoUUID, favoriteButtonData: favoriteButtonData, posterImage: posterImage, movieTitle: movieTitle)
+    }
+}

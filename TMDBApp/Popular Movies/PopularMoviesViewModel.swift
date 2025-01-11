@@ -26,14 +26,14 @@ class PopularMoviesViewModel: ObservableObject {
         }
     }
     
-    private let popularMoviesPagination: PopularMoviesPaginationable
+    private let logic: PopularMoviesLogic
     
     let output: Output
     private var subscriptions: Set<AnyCancellable>
     private var viewDataSubscription: AnyCancellable?
     
     init(popularMoviesPagination: PopularMoviesPaginationable) {
-        self.popularMoviesPagination = popularMoviesPagination
+        self.logic = PopularMoviesLogic(popularMoviesPagination: popularMoviesPagination)
         
         output = Output()
         subscriptions = []
@@ -49,15 +49,13 @@ class PopularMoviesViewModel: ObservableObject {
             }
             .store(in: &subscriptions)
         
-        popularMoviesPagination.events
+        logic.events
             .sink { [weak self] completion in
                 if case let .failure(error) = completion {
                     self?.showError(error.localizedDescription)
                 }
             } receiveValue: { [weak self] event in
-                if case let .data(items) = event {
-                    self?.setData(items)
-                }
+                self?.proceedLogicEvent(event)
             }
             .store(in: &subscriptions)
     }
@@ -69,11 +67,33 @@ class PopularMoviesViewModel: ObservableObject {
         output.viewDataSubject.send(viewData)
     }
     
-    private func setData(_ items: [PopularMoviesData]) {
+    private func proceedLogicEvent(_ event: PopularMoviesLogic.Output) {
+        switch event {
+        case let .changeFavStatus(value):
+            changeFavStatus(value)
+        case let .addData(items):
+            addData(items)
+        case let .showData(items):
+            setData(items)
+        }
+    }
+    
+    private func changeFavStatus(_ value: Bool) {
+        var viewData = output.viewData
+        viewData.favoriteButtonData.isFavorite.toggle()
+        output.viewDataSubject.send(viewData)
+    }
+    
+    private func addData(_ items: [PopularMoviesCellData]) {
+        let items = output.viewData.items + items
+        setData(items)
+    }
+    
+    private func setData(_ items: [PopularMoviesCellData]) {
         let viewData = PopularMoviesViewData(
             favoriteButtonData: output.viewData.favoriteButtonData,
             isLoading: false,
-            items: output.viewData.items + items
+            items: items
         )
         setupBinding(for: viewData)
         output.viewDataSubject.send(viewData)
@@ -85,27 +105,32 @@ class PopularMoviesViewModel: ObservableObject {
             .sink { [weak self] event in
                 switch event {
                 case .favoriteButton:
-                    break
+                    print("favoriteButton")
+                    self?.logic.send(.changeShowFavsOnlyStatus)
                 case let .popularMoviesData(event, at: index):
                     self?.processPopularMoviesDataEvent(event, at: index)
                 }
             }
     }
     
-    private func processPopularMoviesDataEvent(_ event: PopularMoviesData.Output, at index: Int) {
+    private func processPopularMoviesDataEvent(_ event: PopularMoviesCellData.Output, at index: Int) {
         switch event {
-        case .favoriteButton:
-            break
+        case let .favoriteButton(event):
+            switch event {
+            case .changeState:
+                let itemID = output.viewData.items[index].id
+                logic.send(.changeFavStatus(id: itemID))
+            }
         case .appeared:
             if output.viewData.items.count - index <= Policy.refreshDistance {
-                popularMoviesPagination.loadNextPage()
+                logic.send(.loadNextPage)
             }
         }
     }
     
     private func loadData() {
         showLoading()
-        popularMoviesPagination.loadNextPage()
+        logic.send(.loadNextPage)
     }
     
     private func showLoading() {

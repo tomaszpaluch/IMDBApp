@@ -8,13 +8,13 @@
 import Combine
 
 struct FavoriteButtonData {
-    static let initial: Self = .init(isFavorite: false)
+    static var initial: Self { .init(isFavorite: false) }
     
     enum Output {
         case changeState
     }
     
-    let isFavorite: Bool
+    var isFavorite: Bool
     
     private let eventRelay: PassthroughSubject<Output, Never>
     var events: AnyPublisher<Output, Never> { eventRelay.eraseToAnyPublisher() }
