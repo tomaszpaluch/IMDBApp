@@ -33,7 +33,10 @@ struct PopularMoviesView: View {
         }
         .navigationTitle(Texts.PopularMovies.title)
         .navigationBarItems(trailing: FavoriteButton(data: viewData.favoriteButtonData))
-        .searchable(text: $searchText, prompt: Texts.PopularMovies.searchPrompt)
+        .searchable(
+            text: .init { viewData.searchText } set: { phrase in viewData.send(.searchPhrase(phrase)) },
+            prompt: Texts.PopularMovies.searchPrompt
+        )
         .alert(isPresented: .init { viewData.errorMessage != nil } set: { _ in }) {
             Alert(
                 title: Text("Wystąpił błąd"),
@@ -48,10 +51,13 @@ struct PopularMoviesView: View {
     NavigationStack {
         PopularMoviesView(
             viewModel: .init(
-                popularMoviesPagination: PopularMoviesPagination(
-                    service: PopularMoviesApiMock()
-                ),
-                favoriteMoviesPersistence: FavoriteMoviesPersistence()
+                logic: PopularMoviesLogic(
+                    popularMoviesPaginationFactory: PopularMoviesPaginationFactory<
+                        PopularMoviesPagination,
+                        SearchApiMock,
+                        PopularMoviesApiMock>(),
+                    favoriteMoviesPersistence: FavoriteMoviesPersistence()
+                )
             )
         )
     }

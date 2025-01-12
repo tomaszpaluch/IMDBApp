@@ -26,26 +26,20 @@ class PopularMoviesViewModel: ObservableObject {
         }
     }
     
-    private let logic: PopularMoviesLogic
+    private let logic: PopularMoviesLogicable
     
     let output: Output
     private var subscriptions: Set<AnyCancellable>
     private var viewDataSubscription: AnyCancellable?
     
-    init(
-        popularMoviesPagination: PopularMoviesPaginationable,
-        favoriteMoviesPersistence: FavoriteMoviesPersistenceable?
-    ) {
-        self.logic = PopularMoviesLogic(
-            popularMoviesPagination: popularMoviesPagination,
-            favoriteMoviesPersistence: favoriteMoviesPersistence
-        )
+    init(logic: PopularMoviesLogicable) {
+        self.logic = logic
         
         output = Output()
         subscriptions = []
         
         setupBinding()
-        loadData()
+        logic.send(.loadNextPage)
     }
     
     private func setupBinding() {
@@ -68,7 +62,6 @@ class PopularMoviesViewModel: ObservableObject {
     
     private func showError(_ message: String) {
         var viewData = output.viewData
-        viewData.isLoading = false
         viewData.errorMessage = message
         output.viewDataSubject.send(viewData)
     }
@@ -77,10 +70,12 @@ class PopularMoviesViewModel: ObservableObject {
         switch event {
         case let .changeFavStatus(value):
             changeFavStatus(value)
-        case let .addData(items):
-            addData(items)
         case let .showData(items):
             setData(items)
+        case let .setSearchText(phrase):
+            setSearchText(phrase)
+        case let .showLoading(value):
+            showLoading(value)
         }
     }
     
@@ -90,16 +85,12 @@ class PopularMoviesViewModel: ObservableObject {
         output.viewDataSubject.send(viewData)
     }
     
-    private func addData(_ items: [PopularMoviesCellData]) {
-        let items = output.viewData.items + items
-        setData(items)
-    }
-    
     private func setData(_ items: [PopularMoviesCellData]) {
         let viewData = PopularMoviesViewData(
             favoriteButtonData: output.viewData.favoriteButtonData,
-            isLoading: false,
-            items: items
+            items: items,
+            searchText: output.viewData.searchText,
+            isLoading: output.viewData.isLoading
         )
         setupBinding(for: viewData)
         output.viewDataSubject.send(viewData)
@@ -113,6 +104,8 @@ class PopularMoviesViewModel: ObservableObject {
                 case .favoriteButton:
                     print("favoriteButton")
                     self?.logic.send(.changeShowFavsOnlyStatus)
+                case let .searchPhrase(phrase):
+                    self?.logic.send(.startSearch(for: phrase))
                 case let .popularMoviesData(event, at: index):
                     self?.processPopularMoviesDataEvent(event, at: index)
                 }
@@ -134,14 +127,15 @@ class PopularMoviesViewModel: ObservableObject {
         }
     }
     
-    private func loadData() {
-        showLoading()
-        logic.send(.loadNextPage)
+    private func setSearchText(_ phrase: String) {
+        var viewData = output.viewData
+        viewData.searchText = phrase
+        output.viewDataSubject.send(viewData)
     }
     
-    private func showLoading() {
+    private func showLoading(_ value: Bool) {
         var viewData = output.viewData
-        viewData.isLoading = true
+        viewData.isLoading = value
         output.viewDataSubject.send(viewData)
     }
 }

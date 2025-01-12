@@ -5,9 +5,16 @@
 //  Created by Tomasz Paluch on 11/01/2025.
 //
 
+import Foundation
 import Combine
 
-class PopularMoviesLogic {
+protocol PopularMoviesLogicable {
+    var events: AnyPublisher<PopularMoviesLogic.Output, ApiError> { get }
+    
+    func send(_ input: PopularMoviesLogic.Input)
+}
+
+class PopularMoviesLogic: PopularMoviesLogicable {
     struct Storage {
         var searchPhrase: String?
         var showFavsOnly: Bool
@@ -22,61 +29,51 @@ class PopularMoviesLogic {
     enum Input {
         case changeShowFavsOnlyStatus
         case changeFavStatus(id: Int)
+        case startSearch(for: String)
         case loadNextPage
     }
     
     enum Output {
         case changeFavStatus(Bool)
-        case addData([PopularMoviesCellData])
         case showData([PopularMoviesCellData])
+        case setSearchText(String)
+        case showLoading(Bool)
     }
     
-    private let popularMoviesPagination: PopularMoviesPaginationable
+    private let popularMoviesPaginationFactory: PopularMoviesPaginationFactorable
     private let favoriteMoviesPersistence: FavoriteMoviesPersistenceable?
+    private var currentPagination: PopularMoviesPaginationable
     private var storage: Storage
     
+    private let searchRelay: PassthroughSubject<String, Never>
     private let eventRelay: PassthroughSubject<Output, ApiError>
     var events: AnyPublisher<Output, ApiError> { eventRelay.eraseToAnyPublisher() }
-    private var subscriptions: Set<AnyCancellable>
+    private var searchSubscription: AnyCancellable?
+    private var paginationSubscription: AnyCancellable?
     
     init(
-        popularMoviesPagination: PopularMoviesPaginationable,
+        popularMoviesPaginationFactory: PopularMoviesPaginationFactorable,
         favoriteMoviesPersistence: FavoriteMoviesPersistenceable?
     ) {
-        self.popularMoviesPagination = popularMoviesPagination
+        self.popularMoviesPaginationFactory = popularMoviesPaginationFactory
         self.favoriteMoviesPersistence = favoriteMoviesPersistence
+        self.currentPagination = popularMoviesPaginationFactory.make()
         self.storage = Storage()
         
-        subscriptions = []
+        searchRelay = .init()
         eventRelay = .init()
         
         setupBinding()
     }
     
     private func setupBinding() {
-        popularMoviesPagination.events
-            .sink { [weak self] completion in
-                if case let .failure(error) = completion {
-                    self?.eventRelay.send(completion: .failure(error))
-                }
-            } receiveValue: { [weak self] event in
-                if case let .data(items) = event {
-                    self?.setData(items)
-                }
+        searchSubscription = searchRelay
+            .debounce(for: 0.5, scheduler: DispatchQueue.main)
+            .sink { [weak self] phrase in
+                self?.setSearchPhrase(phrase)
             }
-            .store(in: &subscriptions)
-    }
-    
-    private func setData(_ items: [PopularMoviesCellData]) {
-        let items = favoriteMoviesPersistence.map { persistence in
-            items.map {
-                var copy = $0
-                copy.favoriteButtonData.isFavorite =  persistence.isFaved(itemID: $0.id)
-                return copy
-            }
-        } ?? items
-        storage.data = items
-        eventRelay.send(.addData(items))
+        
+        setupPaginationBinding()
     }
     
     func send(_ input: Input) {
@@ -87,6 +84,8 @@ class PopularMoviesLogic {
             eventRelay.send(.changeFavStatus(storage.showFavsOnly))
         case let .changeFavStatus(id: id):
             changeFavStatus(for: id)
+        case let .startSearch(phrase):
+            startSearch(for: phrase)
         case .loadNextPage:
             loadNextPage()
         }
@@ -116,10 +115,58 @@ class PopularMoviesLogic {
         favoriteMoviesPersistence?.saveFav(for: oldData.id)
         eventRelay.send(.showData(storage.data))
     }
+    
+    private func startSearch(for phrase: String) {
+        print("startSearch")
+        searchRelay.send(phrase)
+    }
+    
+    private func setSearchPhrase(_ phrase: String) {
+        let phrase = phrase == "" ? nil : phrase
+        print("setSearchPhrase: \(phrase)")
+        guard storage.searchPhrase != phrase else { return }
+        
+        storage.searchPhrase = phrase
+        currentPagination = popularMoviesPaginationFactory.make(for: phrase)
+        setupPaginationBinding()
+        
+        storage.data = []
+        eventRelay.send(.showData(storage.data))
+        eventRelay.send(.showLoading(true))
+        currentPagination.loadNextPage()
+    }
+    
+    private func setupPaginationBinding() {
+        paginationSubscription?.cancel()
+        paginationSubscription = currentPagination.events
+            .sink { [weak self] completion in
+                if case let .failure(error) = completion {
+                    self?.eventRelay.send(completion: .failure(error))
+                }
+            } receiveValue: { [weak self] event in
+                if case let .data(items) = event {
+                    self?.setData(items)
+                }
+            }
+    }
+    
+    private func setData(_ items: [PopularMoviesCellData]) {
+        let items = favoriteMoviesPersistence.map { persistence in
+            items.map {
+                var copy = $0
+                copy.favoriteButtonData.isFavorite =  persistence.isFaved(itemID: $0.id)
+                return copy
+            }
+        } ?? items
+        storage.data += items
+        showFilteredFavs()
+        eventRelay.send(.setSearchText(storage.searchPhrase ?? ""))
+        eventRelay.send(.showLoading(false))
+    }
 
     private func loadNextPage() {
         if !storage.showFavsOnly {
-            popularMoviesPagination.loadNextPage()
+            currentPagination.loadNextPage()
         }
     }
 }

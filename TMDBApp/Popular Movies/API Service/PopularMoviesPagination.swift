@@ -10,6 +10,7 @@ import Combine
 protocol PopularMoviesPaginationable {
     var events: AnyPublisher<PopularMoviesPagination.Output, ApiError> { get }
     
+    init(service: PopularMoviesApiServiceable)
     func loadNextPage()
     func reset()
 }
@@ -29,7 +30,7 @@ class PopularMoviesPagination: PopularMoviesPaginationable {
     var events: AnyPublisher<Output, ApiError> { eventRelay.eraseToAnyPublisher() }
     private var subscription: AnyCancellable?
     
-    init(service: PopularMoviesApiServiceable) {
+    required init(service: PopularMoviesApiServiceable) {
         self.service = service
         nextPage = 1
         hasMorePages = true

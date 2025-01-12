@@ -13,10 +13,13 @@ struct ContentView: View {
             NavigationStack {
                 PopularMoviesView(
                     viewModel: .init(
-                        popularMoviesPagination: PopularMoviesPagination(
-                            service: PopularMoviesAPIService()
-                        ),
-                        favoriteMoviesPersistence: FavoriteMoviesPersistence()
+                        logic: PopularMoviesLogic(
+                            popularMoviesPaginationFactory: PopularMoviesPaginationFactory<
+                            PopularMoviesPagination,
+                            SearchAPIService,
+                            DiscoverAPIService>(),
+                            favoriteMoviesPersistence: FavoriteMoviesPersistence()
+                        )
                     )
                 )
             }

@@ -8,7 +8,7 @@
 import Foundation
 import Combine
 
-struct PopularMoviesApiDelayedMock: PopularMoviesApiServiceable {
+struct PopularMoviesApiDelayedMock: DiscoverApiServiceable {
     func getMovies(for page: Int) -> AnyPublisher<([PopularMoviesCellData], totalPageCount: Int), ApiError> {
         Future { promise in
             DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
@@ -57,7 +57,7 @@ struct PopularMoviesApiDelayedMock: PopularMoviesApiServiceable {
     }
 }
 
-struct PopularMoviesApiDelayedFailureMock: PopularMoviesApiServiceable {
+struct PopularMoviesApiDelayedFailureMock: DiscoverApiServiceable {
     func getMovies(for page: Int) -> AnyPublisher<([PopularMoviesCellData], totalPageCount: Int), ApiError> {
         Future { promise in
             DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
@@ -81,7 +81,7 @@ struct PopularMoviesApiDelayedFailureMock: PopularMoviesApiServiceable {
     }
 }
 
-struct PopularMoviesApiMock: PopularMoviesApiServiceable {
+struct PopularMoviesApiMock: DiscoverApiServiceable {
     func getMovies(for page: Int) -> AnyPublisher<([PopularMoviesCellData], totalPageCount: Int), ApiError> {
         Future { promise in
             promise(
@@ -118,6 +118,53 @@ struct PopularMoviesApiMock: PopularMoviesApiServiceable {
                         PopularMoviesCellData(posterImage: nil, movieTitle: "Lord of the Rings"),
                         PopularMoviesCellData(posterImage: nil, movieTitle: "Mickey 17"),
                         PopularMoviesCellData(posterImage: nil, movieTitle: "James Bond"),
+                    ]
+                )
+            )
+        }
+        .eraseToAnyPublisher()
+    }
+}
+
+struct SearchApiMock: SearchAPIServiceable {
+    init(searchPhrase: String) { }
+    
+    func getMovies(for page: Int) -> AnyPublisher<([PopularMoviesCellData], totalPageCount: Int), ApiError> {
+        Future { promise in
+            promise(
+                .success(
+                    (
+                        [
+                            PopularMoviesCellData(posterImage: nil, movieTitle: "Search Star Wars"),
+                            PopularMoviesCellData(favoriteButtonData: .init(isFavorite: true), posterImage: nil, movieTitle: "Star Trek"),
+                            PopularMoviesCellData(posterImage: nil, movieTitle: "Search Back To The Future"),
+                            PopularMoviesCellData(posterImage: nil, movieTitle: "Search Matrix"),
+                            PopularMoviesCellData(posterImage: nil, movieTitle: "Search Robocop"),
+                            PopularMoviesCellData(posterImage: nil, movieTitle: "Search Lord of the Rings"),
+                            PopularMoviesCellData(posterImage: nil, movieTitle: "Search Mickey 17"),
+                            PopularMoviesCellData(posterImage: nil, movieTitle: "Search James Bond"),
+                        ],
+                        1
+                    )
+                )
+            )
+        }
+        .eraseToAnyPublisher()
+    }
+    
+    func getMovies(for page: Int) -> AnyPublisher<[PopularMoviesCellData], ApiError> {
+        Future { promise in
+            promise(
+                .success(
+                    [
+                        PopularMoviesCellData(posterImage: nil, movieTitle: "Search Star Wars"),
+                        PopularMoviesCellData(favoriteButtonData: .init(isFavorite: true), posterImage: nil, movieTitle: "Star Trek"),
+                        PopularMoviesCellData(posterImage: nil, movieTitle: "Search Back To The Future"),
+                        PopularMoviesCellData(posterImage: nil, movieTitle: "Search Matrix"),
+                        PopularMoviesCellData(posterImage: nil, movieTitle: "Search Robocop"),
+                        PopularMoviesCellData(posterImage: nil, movieTitle: "Search Lord of the Rings"),
+                        PopularMoviesCellData(posterImage: nil, movieTitle: "Search Mickey 17"),
+                        PopularMoviesCellData(posterImage: nil, movieTitle: "Search James Bond"),
                     ]
                 )
             )
