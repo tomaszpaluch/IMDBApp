@@ -27,6 +27,7 @@ class PopularMoviesLogic: PopularMoviesLogicable {
     }
     
     enum Input {
+        case loadImage(for: Int)
         case changeShowFavsOnlyStatus
         case changeFavStatus(id: Int)
         case startSearch(for: String)
@@ -48,7 +49,7 @@ class PopularMoviesLogic: PopularMoviesLogicable {
     private let searchRelay: PassthroughSubject<String, Never>
     private let eventRelay: PassthroughSubject<Output, ApiError>
     var events: AnyPublisher<Output, ApiError> { eventRelay.eraseToAnyPublisher() }
-    private var searchSubscription: AnyCancellable?
+    private var subscriptions: Set<AnyCancellable>
     private var paginationSubscription: AnyCancellable?
     
     init(
@@ -62,25 +63,51 @@ class PopularMoviesLogic: PopularMoviesLogicable {
         
         searchRelay = .init()
         eventRelay = .init()
+        subscriptions = []
+        
+        Task {
+            await test()
+        }
         
         setupBinding()
     }
     
+    func test() async {
+        let url = URL(string: "https://api.themoviedb.org/3/configuration")!
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.timeoutInterval = 10
+        request.allHTTPHeaderFields = [
+          "accept": "application/json",
+          "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI2OTM5ZjQyYTgyYmVjNGRhZTgyMTNmMjRkMzAzMGFjOCIsIm5iZiI6MTczNjUwNTQ0Ni4zNjUsInN1YiI6IjY3ODBmODY2YzVkMmU5NmUyNjdiMzliNSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.sTpMAgRgCAEXwzGiF4YwLp-ksOPqyMLGNEpYfvQ0C_0"
+        ]
+        
+        do {
+            let (data, _) = try await URLSession.shared.data(for: request)
+            print(String(decoding: data, as: UTF8.self))
+        } catch {
+            print(error)
+        }
+    }
+    
     private func setupBinding() {
-        searchSubscription = searchRelay
+        searchRelay
             .debounce(for: 0.5, scheduler: DispatchQueue.main)
             .sink { [weak self] phrase in
                 self?.setSearchPhrase(phrase)
             }
+            .store(in: &subscriptions)
         
         setupPaginationBinding()
     }
     
     func send(_ input: Input) {
         switch input {
+        case let .loadImage(for: itemID):
+            loadImage(for: itemID)
         case .changeShowFavsOnlyStatus:
             storage.showFavsOnly = !storage.showFavsOnly
-            showFilteredFavs()
+            showData()
             eventRelay.send(.changeFavStatus(storage.showFavsOnly))
         case let .changeFavStatus(id: id):
             changeFavStatus(for: id)
@@ -91,12 +118,27 @@ class PopularMoviesLogic: PopularMoviesLogicable {
         }
     }
     
-    private func showFilteredFavs() {
-        var tempData = storage.data
-        if storage.showFavsOnly {
-            tempData = tempData.filter { $0.favoriteButtonData.isFavorite }
-        }
-        eventRelay.send(.showData(tempData))
+    private func loadImage(for itemID: Int) {
+        let item = storage.data.first(where: { $0.id == itemID })
+        
+        guard
+            item?.posterImage?.imageData == nil,
+            let posterPath = item?.posterImage?.posterPath
+        else { return }
+        
+        var subscription: AnyCancellable?
+        subscription = ImagesApiRequest.getImage(path: posterPath, withSize: .w92)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] completion in
+                if case let .failure(error) = completion {
+                    print(error)
+                }
+                _ = subscription.map { self?.subscriptions.remove($0) }
+            } receiveValue: { [weak self] data in
+                self?.setImage(data: data, for: itemID)
+            }
+        
+        subscription?.store(in: &subscriptions)
     }
     
     private func changeFavStatus(for itemID: Int) {
@@ -117,13 +159,11 @@ class PopularMoviesLogic: PopularMoviesLogicable {
     }
     
     private func startSearch(for phrase: String) {
-        print("startSearch")
         searchRelay.send(phrase)
     }
     
     private func setSearchPhrase(_ phrase: String) {
         let phrase = phrase == "" ? nil : phrase
-        print("setSearchPhrase: \(phrase)")
         guard storage.searchPhrase != phrase else { return }
         
         storage.searchPhrase = phrase
@@ -159,9 +199,24 @@ class PopularMoviesLogic: PopularMoviesLogicable {
             }
         } ?? items
         storage.data += items
-        showFilteredFavs()
+        showData()
         eventRelay.send(.setSearchText(storage.searchPhrase ?? ""))
         eventRelay.send(.showLoading(false))
+    }
+    
+    private func setImage(data: Data, for itemID: Int) {
+        if let index = storage.data.firstIndex(where: { $0.id == itemID }) {
+            storage.data[index].posterImage?.imageData = data
+            showData()
+        }
+    }
+    
+    private func showData() {
+        var tempData = storage.data
+        if storage.showFavsOnly {
+            tempData = tempData.filter { $0.favoriteButtonData.isFavorite }
+        }
+        eventRelay.send(.showData(tempData))
     }
 
     private func loadNextPage() {

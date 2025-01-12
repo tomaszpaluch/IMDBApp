@@ -13,7 +13,13 @@ struct MoviePosterView: View {
     var body: some View {
         Rectangle()
             .foregroundStyle(Colors.gray)
-            .clipShape(RoundedRectangle(cornerRadius: 8))
             .frame(width: 50, height: 50)
+            .overlay {
+                if let imageData = data?.imageData, let image = UIImage(data: imageData) {
+                    Image(uiImage: image)
+                }
+            }
+            .clipped()
+            .clipShape(RoundedRectangle(cornerRadius: 8))
     }
 }

@@ -121,6 +121,8 @@ class PopularMoviesViewModel: ObservableObject {
                 logic.send(.changeFavStatus(id: itemID))
             }
         case .appeared:
+            let itemID = output.viewData.items[index].id
+            logic.send(.loadImage(for: itemID))
             if output.viewData.items.count - index <= Policy.refreshDistance {
                 logic.send(.loadNextPage)
             }

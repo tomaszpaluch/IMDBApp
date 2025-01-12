@@ -29,6 +29,26 @@ struct TMDBApi<T: Decodable> {
             .eraseToAnyPublisher()
     }
     
+    static func makeRequest(with data: ImageApiRequest.RequestData) -> AnyPublisher<T, ApiError> {
+        ImageApiRequest.makeRequest(with: data)
+            .tryMap { data in
+                do {
+                    return try Self.decodeData(data.data)
+                } catch {
+                    throw ApiError.failureDuringDecoding(error)
+                }
+            }
+            .mapError {
+                if let error = $0 as? ApiError {
+                    error
+                } else {
+                    ApiError.unknownError
+                }
+            }
+            .receive(on: DispatchQueue.main)
+            .eraseToAnyPublisher()
+    }
+    
     private static func decodeData(_ data: Data) throws -> T {
         let decoder = JSONDecoder()
         decoder.keyDecodingStrategy = .convertFromSnakeCase

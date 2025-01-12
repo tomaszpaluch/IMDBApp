@@ -20,7 +20,7 @@ struct PopularMoviesCellData: Identifiable {
     
     struct ImageData {
         let posterPath: String
-        let imageData: Data?
+        var imageData: Data?
         
         init(posterPath: String, imageData: Data? = nil) {
             self.posterPath = posterPath
@@ -30,7 +30,7 @@ struct PopularMoviesCellData: Identifiable {
     
     let id: Int
     var favoriteButtonData: FavoriteButtonData
-    let posterImage: ImageData?
+    var posterImage: ImageData?
     let movieTitle: String
     
     private var eventRelay: PassthroughSubject<Output, Never>
