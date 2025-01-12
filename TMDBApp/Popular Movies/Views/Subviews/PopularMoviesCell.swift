@@ -12,12 +12,12 @@ struct PopularMoviesCell: View {
     
     var body: some View {
         Button {
-            
+            data.send(.open)
         } label: {
             HStack(spacing: 16) {
                 FavoriteButton(data: data.favoriteButtonData)
                 
-                MoviePosterView(data: data.posterImage)
+                SmallPosterView(data: data.posterImage)
                 
                 Text(data.movieTitle)
                     .foregroundStyle(Colors.link)

@@ -8,10 +8,13 @@
 import Foundation
 import Combine
 
-
 class PopularMoviesViewModel: ObservableObject {
     enum Policy {
         static let refreshDistance: Int = 10
+    }
+    
+    enum Event {
+        case openDetails(MovieDetailsViewData)
     }
     
     struct Output {
@@ -29,6 +32,9 @@ class PopularMoviesViewModel: ObservableObject {
     private let logic: PopularMoviesLogicable
     
     let output: Output
+    private let eventRelay: PassthroughSubject<Event, Never>
+    var events: AnyPublisher<Event, Never> { eventRelay.eraseToAnyPublisher() }
+    
     private var subscriptions: Set<AnyCancellable>
     private var viewDataSubscription: AnyCancellable?
     
@@ -36,6 +42,7 @@ class PopularMoviesViewModel: ObservableObject {
         self.logic = logic
         
         output = Output()
+        eventRelay = .init()
         subscriptions = []
         
         setupBinding()
@@ -102,7 +109,6 @@ class PopularMoviesViewModel: ObservableObject {
             .sink { [weak self] event in
                 switch event {
                 case .favoriteButton:
-                    print("favoriteButton")
                     self?.logic.send(.changeShowFavsOnlyStatus)
                 case let .searchPhrase(phrase):
                     self?.logic.send(.startSearch(for: phrase))
@@ -126,6 +132,16 @@ class PopularMoviesViewModel: ObservableObject {
             if output.viewData.items.count - index <= Policy.refreshDistance {
                 logic.send(.loadNextPage)
             }
+        case .open:
+            //favoriteButtonData publisher has it's own subscription in Logic, thus there is no need to synchronise fav status
+            let item = output.viewData.items[index]
+            let details = MovieDetailsViewData(
+                id: item.id,
+                favoriteButtonData: item.favoriteButtonData,
+                posterImage: item.posterImage,
+                movieTitle: item.movieTitle
+            )
+            eventRelay.send(.openDetails(details))
         }
     }
     

@@ -41,7 +41,6 @@ class PopularMoviesPagination: PopularMoviesPaginationable {
     func loadNextPage() {
         print(isProcessing, hasMorePages)
         if !isProcessing, hasMorePages {
-            print("loading")
             subscription = service.getMovies(for: nextPage)
                 .sink { [weak self] completion in
                     if case let .failure(error) = completion {
@@ -57,7 +56,6 @@ class PopularMoviesPagination: PopularMoviesPaginationable {
     func finalizePageLoading() {
         nextPage += 1
         subscription = nil
-        print("loading finished")
     }
     
     func finalizePageLoading(items: [PopularMoviesCellData], totalPageCount: Int) {

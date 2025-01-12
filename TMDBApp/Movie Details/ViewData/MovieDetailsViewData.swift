@@ -1,40 +1,48 @@
 //
-//  PopularMoviesData.swift
+//  MovieDetailsViewData.swift
 //  TMDBApp
 //
-//  Created by Tomasz Paluch on 08/01/2025.
+//  Created by Tomasz Paluch on 12/01/2025.
 //
 
-import Foundation
 import Combine
 
-struct PopularMoviesCellData: Identifiable {
-    enum Input {
-        case appeared
-        case open
+struct MovieDetailsViewData: Equatable, Hashable {
+    static func == (lhs: MovieDetailsViewData, rhs: MovieDetailsViewData) -> Bool {
+        lhs.movieTitle == rhs.movieTitle
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(movieTitle)
     }
     
     enum Output {
         case favoriteButton(FavoriteButtonData.Output)
-        case appeared
-        case open
     }
     
     let id: Int
     var favoriteButtonData: FavoriteButtonData
     var posterImage: ImageData?
     let movieTitle: String
+    var overview: String?
+    var releaseDate: String?
+    var spokenLanguages: [String]?
+    var isLoading: Bool
+
+    var errorMessage: String?
     
     private var eventRelay: PassthroughSubject<Output, Never>
     var events: AnyPublisher<Output, Never> { eventRelay.eraseToAnyPublisher() }
     private var subscriptions: Set<AnyCancellable>
     
-    init(id: Int, favoriteButtonData: FavoriteButtonData = .initial, posterImage: ImageData?, movieTitle: String) {
+    init(id: Int, favoriteButtonData: FavoriteButtonData = .initial, posterImage: ImageData?, movieTitle: String, errorMessage: String? = nil, isLoading: Bool = false) {
         self.id = id
         self.favoriteButtonData = favoriteButtonData
         self.posterImage = posterImage
         self.movieTitle = movieTitle
-        
+        self.errorMessage = errorMessage
+        self.isLoading = isLoading
+
         eventRelay = .init()
         subscriptions = []
         
@@ -43,14 +51,5 @@ struct PopularMoviesCellData: Identifiable {
                 eventRelay.send(.favoriteButton(event))
             }
             .store(in: &subscriptions)
-    }
-    
-    func send(_ input: Input) {
-        switch input {
-        case .appeared:
-            eventRelay.send(.appeared)
-        case .open:
-            eventRelay.send(.open)
-        }
     }
 }

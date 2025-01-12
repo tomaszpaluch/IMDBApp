@@ -65,29 +65,7 @@ class PopularMoviesLogic: PopularMoviesLogicable {
         eventRelay = .init()
         subscriptions = []
         
-        Task {
-            await test()
-        }
-        
         setupBinding()
-    }
-    
-    func test() async {
-        let url = URL(string: "https://api.themoviedb.org/3/configuration")!
-        var request = URLRequest(url: url)
-        request.httpMethod = "GET"
-        request.timeoutInterval = 10
-        request.allHTTPHeaderFields = [
-          "accept": "application/json",
-          "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI2OTM5ZjQyYTgyYmVjNGRhZTgyMTNmMjRkMzAzMGFjOCIsIm5iZiI6MTczNjUwNTQ0Ni4zNjUsInN1YiI6IjY3ODBmODY2YzVkMmU5NmUyNjdiMzliNSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.sTpMAgRgCAEXwzGiF4YwLp-ksOPqyMLGNEpYfvQ0C_0"
-        ]
-        
-        do {
-            let (data, _) = try await URLSession.shared.data(for: request)
-            print(String(decoding: data, as: UTF8.self))
-        } catch {
-            print(error)
-        }
     }
     
     private func setupBinding() {

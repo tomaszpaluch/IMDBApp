@@ -16,7 +16,13 @@ struct TMDBApiRequest {
         
         let method: Method
         let endpointPath: String
-        let queryItems: [URLQueryItem]
+        let queryItems: [URLQueryItem]?
+        
+        init(method: Method = .get, endpointPath: String, queryItems: [URLQueryItem]? = nil) {
+            self.method = method
+            self.endpointPath = endpointPath
+            self.queryItems = queryItems
+        }
     }
     
     typealias Output = (data: Data, response: URLResponse)

@@ -6,7 +6,12 @@
 //
 
 struct Texts {
+    struct Common {
+        static let ok = "OK"
+    }
+    
     struct ApiErrors {
+        static let title = "Wystąpił błąd"
         static let unknownError = "An unknown error occured"
         static let badURL = "An bad url error occured"
         static let dataTaskFailure = "An data task error occured"
@@ -16,5 +21,10 @@ struct Texts {
     struct PopularMovies {
         static let title = "Popular Movies"
         static let searchPrompt = "Look for a movie"
+    }
+    
+    struct MovieDetails {
+        static let releaseDate = "Release date"
+        static let showSpokenLanguages = "Show spoken languages"
     }
 }

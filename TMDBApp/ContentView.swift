@@ -9,20 +9,18 @@ import SwiftUI
 
 struct ContentView: View {
     var body: some View {
-        NavigationStack {
-            NavigationStack {
-                PopularMoviesView(
-                    viewModel: .init(
-                        logic: PopularMoviesLogic(
-                            popularMoviesPaginationFactory: PopularMoviesPaginationFactory<
-                            PopularMoviesPagination,
-                            SearchAPIService,
-                            DiscoverAPIService>(),
-                            favoriteMoviesPersistence: FavoriteMoviesPersistence()
-                        )
+        RouterView {
+            PopularMoviesView(
+                viewModel: .init(
+                    logic: PopularMoviesLogic(
+                        popularMoviesPaginationFactory: PopularMoviesPaginationFactory<
+                        PopularMoviesPagination,
+                        SearchAPIService,
+                        DiscoverAPIService>(),
+                        favoriteMoviesPersistence: FavoriteMoviesPersistence()
                     )
                 )
-            }
+            )
         }
     }
 }

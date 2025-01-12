@@ -9,8 +9,8 @@ import SwiftUI
 
 struct PopularMoviesView: View {
     @ObservedObject var viewModel: PopularMoviesViewModel
-    
-    @State private var searchText = ""
+    @EnvironmentObject var router: Router
+
     private var viewData: PopularMoviesViewData { viewModel.output.viewData }
     
     var body: some View {
@@ -39,10 +39,16 @@ struct PopularMoviesView: View {
         )
         .alert(isPresented: .init { viewData.errorMessage != nil } set: { _ in }) {
             Alert(
-                title: Text("Wystąpił błąd"),
+                title: Text(Texts.ApiErrors.title),
                 message:  viewData.errorMessage.map { Text($0) },
-                dismissButton: .default(Text("OK"))
+                dismissButton: .default(Text(Texts.Common.ok))
             )
+        }
+        .onReceive(viewModel.events) { event in
+            switch event {
+            case let .openDetails(data):
+                router.navigateTo(.movieDetails(data))
+            }
         }
     }
 }
