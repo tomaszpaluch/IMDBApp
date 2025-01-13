@@ -24,9 +24,7 @@ struct ImageApiRequest {
         else {
             return Fail<Output, ApiError>(error: .badURL).eraseToAnyPublisher()
         }
-                
-        print(endpointURL)
-        
+                        
         guard
             let url = URLComponents(url: endpointURL, resolvingAgainstBaseURL: true)?.url
         else {

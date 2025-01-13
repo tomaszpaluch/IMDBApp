@@ -31,7 +31,6 @@ struct MovieDetailsResponse: Decodable {
     
     let adult: Bool?
     let backdropPath: String?
-//    let belongsToCollection: [Any: Any]?
     let budget: Int?
     let genres: [Genre]?
     let homepage: String?

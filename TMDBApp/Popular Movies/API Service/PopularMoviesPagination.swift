@@ -39,7 +39,6 @@ class PopularMoviesPagination: PopularMoviesPaginationable {
     }
     
     func loadNextPage() {
-        print(isProcessing, hasMorePages)
         if !isProcessing, hasMorePages {
             subscription = service.getMovies(for: nextPage)
                 .sink { [weak self] completion in
