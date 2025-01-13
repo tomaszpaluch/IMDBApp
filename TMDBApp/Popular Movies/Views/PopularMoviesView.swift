@@ -59,10 +59,10 @@ struct PopularMoviesView: View {
             viewModel: .init(
                 logic: PopularMoviesLogic(
                     popularMoviesPaginationFactory: PopularMoviesPaginationFactory<
-                        PopularMoviesPagination,
-                        SearchApiMock,
-                        PopularMoviesApiMock>(),
-                    favoriteMoviesPersistence: FavoriteMoviesPersistence()
+                    PopularMoviesPagination,
+                    SearchApiMock,
+                    PopularMoviesApiMock>(),
+                    popularMoviesPersistence: PopularMoviesPersistence()
                 )
             )
         )

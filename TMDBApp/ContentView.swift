@@ -17,7 +17,7 @@ struct ContentView: View {
                         PopularMoviesPagination,
                         SearchAPIService,
                         DiscoverAPIService>(),
-                        favoriteMoviesPersistence: FavoriteMoviesPersistence()
+                        popularMoviesPersistence: PopularMoviesPersistence()
                     )
                 )
             )

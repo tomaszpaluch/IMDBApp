@@ -48,7 +48,7 @@ class Router: ObservableObject {
                         PopularMoviesPagination,
                         SearchAPIService,
                         DiscoverAPIService>(),
-                        favoriteMoviesPersistence: FavoriteMoviesPersistence()
+                        popularMoviesPersistence: PopularMoviesPersistence()
                     )
                 )
             )

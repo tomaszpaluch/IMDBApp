@@ -18,10 +18,12 @@ class PopularMoviesLogic: PopularMoviesLogicable {
     struct Storage {
         var searchPhrase: String?
         var showFavsOnly: Bool
+        var favedMovies: [Int]
         var data: [PopularMoviesCellData]
         
         init() {
             showFavsOnly = false
+            favedMovies = []
             data = []
         }
     }
@@ -42,7 +44,7 @@ class PopularMoviesLogic: PopularMoviesLogicable {
     }
     
     private let popularMoviesPaginationFactory: PopularMoviesPaginationFactorable
-    private let favoriteMoviesPersistence: FavoriteMoviesPersistenceable?
+    private let popularMoviesPersistence: PopularMoviesPersistence?
     private var currentPagination: PopularMoviesPaginationable
     private var storage: Storage
     
@@ -54,10 +56,10 @@ class PopularMoviesLogic: PopularMoviesLogicable {
     
     init(
         popularMoviesPaginationFactory: PopularMoviesPaginationFactorable,
-        favoriteMoviesPersistence: FavoriteMoviesPersistenceable?
+        popularMoviesPersistence: PopularMoviesPersistence?
     ) {
         self.popularMoviesPaginationFactory = popularMoviesPaginationFactory
-        self.favoriteMoviesPersistence = favoriteMoviesPersistence
+        self.popularMoviesPersistence = popularMoviesPersistence
         self.currentPagination = popularMoviesPaginationFactory.make()
         self.storage = Storage()
         
@@ -66,6 +68,32 @@ class PopularMoviesLogic: PopularMoviesLogicable {
         subscriptions = []
         
         setupBinding()
+        loadPersistenceData()
+    }
+    
+    private func loadPersistenceData() {
+        popularMoviesPersistence?.load(
+            .favorites { [weak self] favs in
+                self?.storage.favedMovies = favs
+            }
+        )
+
+        popularMoviesPersistence?.load(
+            .popularMovies { [weak self] data in
+                if let searchPhrase = data.searchPhrase {
+                    self?.setSearchPhrase(searchPhrase)
+                }
+                self?.setData(data.items.map {
+                    .init(
+                        id: $0.id,
+                        posterImage: $0.posterImagePath.map {
+                            .init(posterPath: $0)
+                        },
+                        movieTitle: $0.movieTitle
+                    )
+                })
+            }
+        )
     }
     
     private func setupBinding() {
@@ -122,6 +150,12 @@ class PopularMoviesLogic: PopularMoviesLogicable {
     private func changeFavStatus(for itemID: Int) {
         guard let index = storage.data.firstIndex(where: { $0.id == itemID }) else { return }
         
+        if let index = storage.favedMovies.firstIndex(of: itemID) {
+            storage.favedMovies.remove(at: index)
+        } else {
+            storage.favedMovies.append(itemID)
+        }
+        
         let oldData = storage.data[index]
         storage.data[index] = .init(
             id: oldData.id,
@@ -132,7 +166,7 @@ class PopularMoviesLogic: PopularMoviesLogicable {
             movieTitle: oldData.movieTitle
         )
         
-        favoriteMoviesPersistence?.saveFav(for: oldData.id)
+        popularMoviesPersistence?.save(.favorites(storage.favedMovies))
         eventRelay.send(.showData(storage.data))
     }
     
@@ -169,14 +203,14 @@ class PopularMoviesLogic: PopularMoviesLogicable {
     }
     
     private func setData(_ items: [PopularMoviesCellData]) {
-        let items = favoriteMoviesPersistence.map { persistence in
-            items.map {
-                var copy = $0
-                copy.favoriteButtonData.isFavorite =  persistence.isFaved(itemID: $0.id)
-                return copy
-            }
-        } ?? items
+        let items = items.map {
+            var copy = $0
+            copy.favoriteButtonData.isFavorite = storage.favedMovies.contains(copy.id)
+            return copy
+        }
+
         storage.data += items
+        saveData()
         showData()
         eventRelay.send(.setSearchText(storage.searchPhrase ?? ""))
         eventRelay.send(.showLoading(false))
@@ -187,6 +221,23 @@ class PopularMoviesLogic: PopularMoviesLogicable {
             storage.data[index].posterImage?.imageData = data
             showData()
         }
+    }
+    
+    private func saveData() {
+        popularMoviesPersistence?.save(
+            .popularMovies(
+                .init(
+                    searchPhrase: storage.searchPhrase,
+                    items: storage.data.map {
+                        .init(
+                            id: $0.id,
+                            posterImagePath: $0.posterImage?.posterPath,
+                            movieTitle: $0.movieTitle
+                        )
+                    }
+                )
+            )
+        )
     }
     
     private func showData() {
