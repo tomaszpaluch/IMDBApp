@@ -17,17 +17,7 @@ struct SearchAPIService: SearchAPIServiceable {
     init(searchPhrase: String) {
         self.searchPhrase = searchPhrase
     }
-    
-    func getMovies(for page: Int) -> AnyPublisher<[PopularMoviesCellData], ApiError> {
-        SearchApiRequest.getMovies(with: searchPhrase, for: page)
-            .map { data in
-                data.results?.compactMap {
-                    PopularMoviesResponseMapper.map($0)
-                } ?? []
-            }
-            .eraseToAnyPublisher()
-    }
-    
+
     /*It may be worth to consider using another mapper, error throwing when totalPages == nil*/
     func getMovies(for page: Int) -> AnyPublisher<([PopularMoviesCellData], totalPageCount: Int), ApiError> {
         SearchApiRequest.getMovies(with: searchPhrase, for: page)

@@ -9,5 +9,4 @@ import Combine
 
 protocol PopularMoviesApiServiceable {
     func getMovies(for page: Int) -> AnyPublisher<([PopularMoviesCellData], totalPageCount: Int), ApiError>
-    func getMovies(for page: Int) -> AnyPublisher<[PopularMoviesCellData], ApiError>
 }
