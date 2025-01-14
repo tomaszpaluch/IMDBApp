@@ -18,7 +18,7 @@ struct PopularMoviesViewData {
         case popularMoviesData(PopularMoviesCellData.Output, at: Int)
     }
     
-    static let initial: Self = .init(favoriteButtonData: .initial, items: [], isLoading: true)
+    static var initial: Self { .init(favoriteButtonData: .initial, items: [], isLoading: true) }
     
     var favoriteButtonData: FavoriteButtonData
     var items: [PopularMoviesCellData]

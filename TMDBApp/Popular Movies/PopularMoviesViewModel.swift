@@ -51,6 +51,7 @@ class PopularMoviesViewModel: ObservableObject {
     
     private func setupBinding() {
         output.viewDataPublisher
+            .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 self?.objectWillChange.send()
             }

@@ -170,7 +170,7 @@ class PopularMoviesLogic: PopularMoviesLogicable {
         )
         
         popularMoviesPersistence?.save(.favorites(storage.favedMovies))
-        eventRelay.send(.showData(storage.data))
+        showData()
     }
     
     private func startSearch(for phrase: String) {

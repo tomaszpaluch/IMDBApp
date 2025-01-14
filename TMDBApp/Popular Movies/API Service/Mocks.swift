@@ -179,3 +179,74 @@ fileprivate extension PopularMoviesCellData {
         self.init(id: pseudoUUID, favoriteButtonData: favoriteButtonData, posterImage: posterImage, movieTitle: movieTitle)
     }
 }
+
+struct SearchAPIServiceMock: SearchAPIServiceable {
+    private let data: [PopularMoviesCellData]
+    private let itemsPerPage: Int
+    private let totalPageCount: Int
+
+    init(searchPhrase: String) {
+        data = PopularMoviesCellDataRepository.data.filter {
+            $0.movieTitle.contains(searchPhrase)
+        }
+        itemsPerPage = 10
+        totalPageCount = Int((Float(data.count) / Float(itemsPerPage)).rounded(.up))
+    }
+    
+    func getMovies(for page: Int) -> AnyPublisher<([PopularMoviesCellData], totalPageCount: Int), ApiError> {
+        let pageData: [PopularMoviesCellData]
+        if (page - 1) * itemsPerPage > data.count {
+            pageData = []
+        } else {
+            pageData = Array(data[(page - 1) * itemsPerPage ..< min(page * itemsPerPage, data.count)])
+        }
+        return Just((pageData, totalPageCount))
+            .setFailureType(to: ApiError.self)
+            .eraseToAnyPublisher()
+    }
+}
+
+struct DiscoverAPIServiceMock: DiscoverApiServiceable {
+    static let itemsPerPage: Int = 10
+    
+    private let totalDataCount: Int
+    private let totalPageCount: Int
+    
+    init() {
+        totalDataCount = PopularMoviesCellDataRepository.data.count
+        totalPageCount = Int((Float(totalDataCount) / Float(Self.itemsPerPage)).rounded(.up))
+    }
+    
+    func getMovies(for page: Int) -> AnyPublisher<([PopularMoviesCellData], totalPageCount: Int), ApiError> {
+        let pageData: [PopularMoviesCellData]
+        let itemsPerPage = Self.itemsPerPage
+        if (page - 1) * itemsPerPage > totalDataCount {
+            pageData = []
+        } else {
+            pageData = Array(PopularMoviesCellDataRepository.data[(page - 1) * itemsPerPage ..< min(page * itemsPerPage, totalDataCount)])
+        }
+        return Just((pageData, totalPageCount))
+            .setFailureType(to: ApiError.self)
+            .eraseToAnyPublisher()
+    }
+}
+
+struct PopularMoviesCellDataRepository {
+    static var data: [PopularMoviesCellData] = {
+        let letters = ["Alpha", "Beta", "Gamma", "Delta", "Epsilon", "Zeta", "Eta", "Theta", "Iota", "Upsilon", "Omega"]
+        return letters.reduce([PopularMoviesCellData]()) { result, element in
+            let newMovies = (1...5).map {
+                PopularMoviesCellData(
+                    id: result.count + $0,
+                    favoriteButtonData: .init(isFavorite: false),
+                    posterImage: nil,
+                    movieTitle: "\(element) \($0)"
+                )
+            }
+            
+            var updatedResult = result
+            updatedResult.append(contentsOf: newMovies)
+            return updatedResult
+        }
+    }()
+}
