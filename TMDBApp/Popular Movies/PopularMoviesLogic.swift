@@ -19,11 +19,13 @@ class PopularMoviesLogic: PopularMoviesLogicable {
         var searchPhrase: String?
         var showFavsOnly: Bool
         var favedMovies: [Int]
+        var hasPreloadedData: Bool
         var data: [PopularMoviesCellData]
         
         init() {
             showFavsOnly = false
             favedMovies = []
+            hasPreloadedData = false
             data = []
         }
     }
@@ -92,6 +94,7 @@ class PopularMoviesLogic: PopularMoviesLogicable {
                         movieTitle: $0.movieTitle
                     )
                 })
+                self?.storage.hasPreloadedData = true
             }
         )
     }
@@ -209,6 +212,11 @@ class PopularMoviesLogic: PopularMoviesLogicable {
             return copy
         }
 
+        if storage.hasPreloadedData {
+            storage.data = []
+            storage.hasPreloadedData = false
+        }
+        
         storage.data += items
         saveData()
         showData()
@@ -250,7 +258,7 @@ class PopularMoviesLogic: PopularMoviesLogicable {
 
     private func loadNextPage() {
         if !storage.showFavsOnly {
-            currentPagination.loadNextPage()
+//            currentPagination.loadNextPage()
         }
     }
 }
