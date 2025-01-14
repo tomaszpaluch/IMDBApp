@@ -258,7 +258,7 @@ class PopularMoviesLogic: PopularMoviesLogicable {
 
     private func loadNextPage() {
         if !storage.showFavsOnly {
-//            currentPagination.loadNextPage()
+            currentPagination.loadNextPage()
         }
     }
 }
