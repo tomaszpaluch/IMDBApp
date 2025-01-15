@@ -46,6 +46,7 @@ class PopularMoviesLogic: PopularMoviesLogicable {
     }
     
     private let popularMoviesPaginationFactory: PopularMoviesPaginationFactorable
+    private let imageAPIService: ImageAPIServiceable
     private let popularMoviesPersistence: PopularMoviesPersistence?
     private var currentPagination: PopularMoviesPaginationable
     private var storage: Storage
@@ -58,9 +59,11 @@ class PopularMoviesLogic: PopularMoviesLogicable {
     
     init(
         popularMoviesPaginationFactory: PopularMoviesPaginationFactorable,
+        imageAPIService: ImageAPIServiceable,
         popularMoviesPersistence: PopularMoviesPersistence?
     ) {
         self.popularMoviesPaginationFactory = popularMoviesPaginationFactory
+        self.imageAPIService = imageAPIService
         self.popularMoviesPersistence = popularMoviesPersistence
         self.currentPagination = popularMoviesPaginationFactory.make()
         self.storage = Storage()
@@ -136,7 +139,7 @@ class PopularMoviesLogic: PopularMoviesLogicable {
         else { return }
         
         var subscription: AnyCancellable?
-        subscription = ImageAPIService.getImage(path: posterPath, withSize: .w92)
+        subscription = imageAPIService.getImage(path: posterPath, withSize: .w92)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] completion in
                 if case let .failure(error) = completion {

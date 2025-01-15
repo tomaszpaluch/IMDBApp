@@ -9,7 +9,7 @@ import Foundation
 import Combine
 
 protocol ImageAPIServiceable {
-    static func getImage(path: String, withSize: ImageAPIService.Size) -> AnyPublisher<Data, ApiError>
+    func getImage(path: String, withSize: ImageAPIService.Size) -> AnyPublisher<Data, ApiError>
 }
 
 struct ImageAPIService: ImageAPIServiceable {
@@ -23,7 +23,7 @@ struct ImageAPIService: ImageAPIServiceable {
         case w780
     }
     
-    static func getImage(path: String, withSize size: Size = .original) -> AnyPublisher<Data, ApiError> {
+    func getImage(path: String, withSize size: Size = .original) -> AnyPublisher<Data, ApiError> {
         let data = ImageApiRequest.RequestData(
             posterPath: "\(size.rawValue)\(path)"
         )

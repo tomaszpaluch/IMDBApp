@@ -72,6 +72,7 @@ struct PopularMoviesView: View {
                     PopularMoviesPagination,
                     SearchApiMock,
                     PopularMoviesApiMock>(),
+                    imageAPIService: ImageAPIService(),
                     popularMoviesPersistence: PopularMoviesPersistence()
                 )
             )

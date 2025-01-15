@@ -17,6 +17,7 @@ struct ContentView: View {
                         PopularMoviesPagination,
                         SearchAPIService,
                         DiscoverAPIService>(),
+                        imageAPIService: ImageAPIService(),
                         popularMoviesPersistence: PopularMoviesPersistence()
                     )
                 )
