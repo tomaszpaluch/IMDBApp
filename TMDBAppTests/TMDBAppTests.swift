@@ -30,6 +30,12 @@ struct TMDBAppTests: Testable {
         #expect(itemCount == DiscoverAPIServiceMock.itemsPerPage)
     }
     
+    @Test func getItemCount_LoadSecondPage_Returns20() throws {
+        viewModel.output.viewData.items.last?.send(.appeared)
+        let itemCount = viewModel.output.viewData.items.count
+        #expect(itemCount == 2 * DiscoverAPIServiceMock.itemsPerPage)
+    }
+    
     @Test func getMovieIDAndTitle_FirstMovie_Returns1AndAlpha_1() throws {
         let firstItem = viewModel.output.viewData.items.first
         #expect(firstItem?.id == 1 && firstItem?.movieTitle == "Alpha 1")

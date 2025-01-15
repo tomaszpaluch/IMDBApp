@@ -6,6 +6,7 @@
 //
 
 import Combine
+import Foundation
 
 protocol PopularMoviesPaginationable {
     var events: AnyPublisher<PopularMoviesPagination.Output, ApiError> { get }
@@ -24,7 +25,7 @@ class PopularMoviesPagination: PopularMoviesPaginationable {
     
     private var nextPage: Int
     private var hasMorePages: Bool
-    private var isProcessing: Bool { subscription != nil }
+    private var isProcessing: Bool
     
     private let eventRelay: PassthroughSubject<Output, ApiError>
     var events: AnyPublisher<Output, ApiError> { eventRelay.eraseToAnyPublisher() }
@@ -34,12 +35,14 @@ class PopularMoviesPagination: PopularMoviesPaginationable {
         self.service = service
         nextPage = 1
         hasMorePages = true
+        isProcessing = false
         
         eventRelay = .init()
     }
     
     func loadNextPage() {
         if !isProcessing, hasMorePages {
+            isProcessing = true
             subscription = service.getMovies(for: nextPage)
                 .sink { [weak self] completion in
                     if case let .failure(error) = completion {
@@ -52,12 +55,13 @@ class PopularMoviesPagination: PopularMoviesPaginationable {
         }
     }
     
-    func finalizePageLoading() {
+    private func finalizePageLoading() {
         nextPage += 1
+        isProcessing = false
         subscription = nil
     }
     
-    func finalizePageLoading(items: [PopularMoviesCellData], totalPageCount: Int) {
+    private func finalizePageLoading(items: [PopularMoviesCellData], totalPageCount: Int) {
         eventRelay.send(.data(items))
         hasMorePages = totalPageCount != nextPage
     }

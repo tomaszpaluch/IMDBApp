@@ -268,7 +268,7 @@ struct DiscoverAPIServiceFailureMock: DiscoverApiServiceable {
 }
 
 struct PopularMoviesCellDataRepository {
-    static var data: [PopularMoviesCellData] = {
+    static var data: [PopularMoviesCellData] {
         let letters = ["Alpha", "Beta", "Gamma", "Delta", "Epsilon", "Zeta", "Eta", "Theta", "Iota", "Upsilon", "Omega"]
         return letters.reduce([PopularMoviesCellData]()) { result, element in
             let newMovies = (1...5).map {
@@ -284,5 +284,5 @@ struct PopularMoviesCellDataRepository {
             updatedResult.append(contentsOf: newMovies)
             return updatedResult
         }
-    }()
+    }
 }
