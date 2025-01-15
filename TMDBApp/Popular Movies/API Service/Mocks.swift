@@ -206,6 +206,25 @@ struct SearchAPIServiceMock: SearchAPIServiceable {
     }
 }
 
+struct SearchAPIServiceFailureMock: SearchAPIServiceable {
+    private let data: [PopularMoviesCellData]
+    private let itemsPerPage: Int
+    private let totalPageCount: Int
+
+    init(searchPhrase: String) {
+        data = PopularMoviesCellDataRepository.data.filter {
+            $0.movieTitle.contains(searchPhrase)
+        }
+        itemsPerPage = 10
+        totalPageCount = Int((Float(data.count) / Float(itemsPerPage)).rounded(.up))
+    }
+    
+    func getMovies(for page: Int) -> AnyPublisher<([PopularMoviesCellData], totalPageCount: Int), ApiError> {
+        Fail(error: ApiError.unknownError)
+            .eraseToAnyPublisher()
+    }
+}
+
 struct DiscoverAPIServiceMock: DiscoverApiServiceable {
     static let itemsPerPage: Int = 10
     
@@ -227,6 +246,23 @@ struct DiscoverAPIServiceMock: DiscoverApiServiceable {
         }
         return Just((pageData, totalPageCount))
             .setFailureType(to: ApiError.self)
+            .eraseToAnyPublisher()
+    }
+}
+
+struct DiscoverAPIServiceFailureMock: DiscoverApiServiceable {
+    static let itemsPerPage: Int = 10
+    
+    private let totalDataCount: Int
+    private let totalPageCount: Int
+    
+    init() {
+        totalDataCount = PopularMoviesCellDataRepository.data.count
+        totalPageCount = Int((Float(totalDataCount) / Float(Self.itemsPerPage)).rounded(.up))
+    }
+    
+    func getMovies(for page: Int) -> AnyPublisher<([PopularMoviesCellData], totalPageCount: Int), ApiError> {
+        Fail(error: ApiError.unknownError)
             .eraseToAnyPublisher()
     }
 }

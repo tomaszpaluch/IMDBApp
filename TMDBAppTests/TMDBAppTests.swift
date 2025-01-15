@@ -19,12 +19,13 @@ struct TMDBAppTests: Testable {
         viewModel = PopularMoviesViewModel(
             logic: PopularMoviesLogic(
                 popularMoviesPaginationFactory: PopularMoviesPaginationFactoryMock(),
+                imageAPIService: ImageAPIServiceFake(),
                 popularMoviesPersistence: nil
             )
         )
     }
     
-    @Test func getItemsCount_ForFirstPage_Returns10() throws {
+    @Test func getItemCount_ForFirstPage_Returns10() throws {
         let itemCount = viewModel.output.viewData.items.count
         #expect(itemCount == DiscoverAPIServiceMock.itemsPerPage)
     }
@@ -65,7 +66,7 @@ struct TMDBAppTests: Testable {
     @Test func setSearchText_ShowMoviesContainingBeta_ReturnsBeta() async throws {
         let searchText = "Beta"
         viewModel.output.viewData.send(.searchPhrase(searchText))
-        try await continuation(for: viewModel.objectWillChange.eraseToAnyPublisher(), debounceTime: 0.50)
+        try await continuation(for: viewModel.objectWillChange.eraseToAnyPublisher(), debounceTime: 0.55)
 
         #expect(viewModel.output.viewData.searchText == searchText)
     }
@@ -73,7 +74,7 @@ struct TMDBAppTests: Testable {
     @Test func getMovieCount_ShowMoviesContainingBeta_Returns5() async throws {
         let searchText = "Beta"
         viewModel.output.viewData.send(.searchPhrase(searchText))
-        try await continuation(for: viewModel.objectWillChange.eraseToAnyPublisher(), debounceTime: 0.50)
+        try await continuation(for: viewModel.objectWillChange.eraseToAnyPublisher(), debounceTime: 0.55)
         
         #expect(viewModel.output.viewData.items.count == 5)
     }
@@ -81,8 +82,10 @@ struct TMDBAppTests: Testable {
     @Test func getMovieTitle_GetFirstMovieContainingBeta_ReturnsBeta_1() async throws {
         let searchText = "Beta"
         viewModel.output.viewData.send(.searchPhrase(searchText))
-        try await continuation(for: viewModel.objectWillChange.eraseToAnyPublisher(), debounceTime: 0.50)
+        try await continuation(for: viewModel.objectWillChange.eraseToAnyPublisher(), debounceTime: 0.55)
         
         #expect(viewModel.output.viewData.items.first?.movieTitle == "\(searchText) 1")
     }
 }
+
+

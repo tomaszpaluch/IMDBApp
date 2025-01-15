@@ -36,3 +36,11 @@ struct ImageAPIService: ImageAPIServiceable {
             .eraseToAnyPublisher()
     }
 }
+
+struct ImageAPIServiceFake: ImageAPIServiceable {
+    func getImage(path: String, withSize size: ImageAPIService.Size = .original) -> AnyPublisher<Data, ApiError> {
+        Just(Data())
+            .setFailureType(to: ApiError.self)
+            .eraseToAnyPublisher()
+    }
+}
