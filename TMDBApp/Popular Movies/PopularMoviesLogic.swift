@@ -136,7 +136,7 @@ class PopularMoviesLogic: PopularMoviesLogicable {
         else { return }
         
         var subscription: AnyCancellable?
-        subscription = ImagesApiRequest.getImage(path: posterPath, withSize: .w92)
+        subscription = ImageAPIService.getImage(path: posterPath, withSize: .w92)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] completion in
                 if case let .failure(error) = completion {

@@ -8,11 +8,11 @@
 import Foundation
 import Combine
 
-protocol ImagesApiRequestable {
-    static func getImage(path: String, withSize: ImagesApiRequest.Size) -> AnyPublisher<Data, ApiError>
+protocol ImageAPIServiceable {
+    static func getImage(path: String, withSize: ImageAPIService.Size) -> AnyPublisher<Data, ApiError>
 }
 
-struct ImagesApiRequest: ImagesApiRequestable {
+struct ImageAPIService: ImageAPIServiceable {
     enum Size: String {
         case original
         case w92
