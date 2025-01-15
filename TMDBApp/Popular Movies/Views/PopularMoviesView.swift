@@ -21,6 +21,11 @@ struct PopularMoviesView: View {
             }
         }
         .listStyle(.plain)
+        .background {
+            if !viewData.isLoading, viewData.items.isEmpty {
+                NoResultView()
+            }
+        }
         .overlay {
             if viewData.isLoading {
                 Color.white
