@@ -78,7 +78,7 @@
          <EnvironmentVariable
             key = "useMockData"
             value = "true"
-            isEnabled = "YES">
+            isEnabled = "NO">
          </EnvironmentVariable>
       </EnvironmentVariables>
    </LaunchAction>
