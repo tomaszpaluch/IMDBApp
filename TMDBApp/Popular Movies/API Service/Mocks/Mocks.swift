@@ -8,6 +8,8 @@
 import Foundation
 import Combine
 
+typealias PopularMoviesPaginationFactoryMock = PopularMoviesPaginationFactory<PopularMoviesPagination, SearchAPIServiceMock, DiscoverAPIServiceMock>
+
 struct PopularMoviesApiDelayedMock: DiscoverApiServiceable {
     func getMovies(for page: Int) -> AnyPublisher<([PopularMoviesCellData], totalPageCount: Int), ApiError> {
         Future { promise in
@@ -264,25 +266,5 @@ struct DiscoverAPIServiceFailureMock: DiscoverApiServiceable {
     func getMovies(for page: Int) -> AnyPublisher<([PopularMoviesCellData], totalPageCount: Int), ApiError> {
         Fail(error: ApiError.unknownError)
             .eraseToAnyPublisher()
-    }
-}
-
-struct PopularMoviesCellDataRepository {
-    static var data: [PopularMoviesCellData] {
-        let letters = ["Alpha", "Beta", "Gamma", "Delta", "Epsilon", "Zeta", "Eta", "Theta", "Iota", "Upsilon", "Omega"]
-        return letters.reduce([PopularMoviesCellData]()) { result, element in
-            let newMovies = (1...5).map {
-                PopularMoviesCellData(
-                    id: result.count + $0,
-                    favoriteButtonData: .init(isFavorite: false),
-                    posterImage: nil,
-                    movieTitle: "\(element) \($0)"
-                )
-            }
-            
-            var updatedResult = result
-            updatedResult.append(contentsOf: newMovies)
-            return updatedResult
-        }
     }
 }

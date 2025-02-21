@@ -10,9 +10,7 @@ import Foundation
 import Combine
 @testable import TMDBApp
 
-struct TMDBAppTests: Testable {
-    typealias PopularMoviesPaginationFactoryMock = PopularMoviesPaginationFactory<PopularMoviesPagination, SearchAPIServiceMock, DiscoverAPIServiceMock>
-    
+struct TMDBAppTests: Testable {    
     let viewModel: PopularMoviesViewModel
     
     init() {

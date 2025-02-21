@@ -6,38 +6,72 @@
 //
 
 import XCTest
+@testable import TMDBApp
 
 final class TMDBAppUITests: XCTestCase {
-
     override func setUpWithError() throws {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
-
-        // In UI tests it is usually best to stop immediately when a failure occurs.
-        continueAfterFailure = false
-
-        // In UI tests it’s important to set the initial state - such as interface orientation - required for your tests before they run. The setUp method is a good place to do this.
-    }
-
-    override func tearDownWithError() throws {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
-    }
-
-    @MainActor
-    func testExample() throws {
-        // UI tests must launch the application that they test.
         let app = XCUIApplication()
+        continueAfterFailure = false
+        app.launchEnvironment = ["useMockData" : "true"]
         app.launch()
-
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
     }
 
-    @MainActor
-    func testLaunchPerformance() throws {
-        if #available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 7.0, *) {
-            // This measures how long it takes to launch your application.
-            measure(metrics: [XCTApplicationLaunchMetric()]) {
-                XCUIApplication().launch()
-            }
+    func test_SwipeUp_LoadNextPage() throws {
+        guard
+            let ninthButtonTitle = MockMovieTitles.titles[safe: 8],
+            let eighteenthButtonTitle = MockMovieTitles.titles[safe: 17]
+        else {
+            XCTFail()
+            return
         }
+        
+        let collectionViewsQuery = XCUIApplication().collectionViews
+        collectionViewsQuery.buttons[ninthButtonTitle].swipeUp(velocity: .fast)
+        let button = collectionViewsQuery.buttons[eighteenthButtonTitle]
+        XCTAssertTrue(button.exists)
+    }
+    
+    func test_Search_LoadFilmNamed() throws {
+        guard
+            let firstButtonTitle = MockMovieTitles.titles[safe: 0],
+            let sixthButtonTitle = MockMovieTitles.titles[safe: 5]
+        else {
+            XCTFail()
+            return
+        }
+        
+        let app = XCUIApplication()
+        let lookForAMovieSearchField = app.navigationBars[Texts.PopularMovies.title].searchFields[Texts.PopularMovies.searchPrompt]
+        let button = app.collectionViews.buttons[firstButtonTitle]
+        let _ = button.waitForExistence(timeout: 1)
+        XCTAssertTrue(lookForAMovieSearchField.exists)
+        
+        lookForAMovieSearchField.tap()
+        lookForAMovieSearchField.typeText(sixthButtonTitle)
+
+        let resultButton = app.collectionViews.buttons[sixthButtonTitle]
+        let resultButtonExists = resultButton.waitForExistence(timeout: 1)
+        XCTAssertTrue(resultButtonExists)
+    }
+    
+    func test_Favouries_AddFilmToFavourites() throws {
+        let app = XCUIApplication()
+
+        guard
+            let buttonName = MockMovieTitles.titles[safe: 4]
+        else {
+            XCTFail()
+            return
+        }
+        
+        let element = app.collectionViews.buttons[buttonName]
+        element.buttons[AccessibilityIdentifiers.PopularMovies.favouriteButton].tap()
+        
+        XCTAssertTrue(app.navigationBars[Texts.PopularMovies.title].exists)
+
+        app.navigationBars[Texts.PopularMovies.title].buttons[AccessibilityIdentifiers.PopularMovies.favouriteButton].tap()
+        let collectionViewsQuery = XCUIApplication().collectionViews
+        let button = collectionViewsQuery.buttons[buttonName]
+        XCTAssertTrue(button.exists)
     }
 }

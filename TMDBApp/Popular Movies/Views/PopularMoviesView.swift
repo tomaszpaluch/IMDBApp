@@ -38,7 +38,11 @@ struct PopularMoviesView: View {
             }
         }
         .navigationTitle(Texts.PopularMovies.title)
-        .navigationBarItems(trailing: FavoriteButton(data: viewData.favoriteButtonData))
+        .navigationBarItems(
+            trailing: FavoriteButton(
+                data: viewData.favoriteButtonData
+            )
+        )
         .searchable(
             text: .init { viewData.searchText } set: { phrase in viewData.send(.searchPhrase(phrase)) },
             prompt: Texts.PopularMovies.searchPrompt

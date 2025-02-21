@@ -34,9 +34,25 @@
 		30836BC92D3561FD00132D53 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		30949DDC2D68ED4B00B20D41 /* Exceptions for "TMDBApp" folder in "TMDBAppUITests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Common/Helpers/AccessibilityIdentifiers.swift,
+				"Common/Helpers/Collection+safe.swift",
+				Common/Helpers/Texts.swift,
+				"Popular Movies/API Service/Mocks/MockMovieTitles.swift",
+			);
+			target = 300AB8182D2EAA08006A3915 /* TMDBAppUITests */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		300AB8012D2EAA06006A3915 /* TMDBApp */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				30949DDC2D68ED4B00B20D41 /* Exceptions for "TMDBApp" folder in "TMDBAppUITests" target */,
+			);
 			path = TMDBApp;
 			sourceTree = "<group>";
 		};

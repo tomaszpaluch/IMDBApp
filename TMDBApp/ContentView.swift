@@ -12,15 +12,28 @@ struct ContentView: View {
         RouterView {
             PopularMoviesView(
                 viewModel: .init(
-                    logic: PopularMoviesLogic(
-                        popularMoviesPaginationFactory: PopularMoviesPaginationFactory<
-                        PopularMoviesPagination,
-                        SearchAPIService,
-                        DiscoverAPIService>(),
-                        imageAPIService: ImageAPIService(),
-                        popularMoviesPersistence: PopularMoviesPersistence()
-                    )
+                    logic: popularMoviesLogicFactory
                 )
+            )
+        }
+    }
+    
+    var popularMoviesLogicFactory: PopularMoviesLogicable {
+        if let value = ProcessInfo.processInfo.environment["useMockData"], value == "true" {
+            PopularMoviesLogic(
+                popularMoviesPaginationFactory: PopularMoviesPaginationFactoryMock(),
+                imageAPIService: ImageAPIServiceFake(),
+                popularMoviesPersistence: nil
+            )
+        } else {
+            PopularMoviesLogic(
+                popularMoviesPaginationFactory: PopularMoviesPaginationFactory<
+                PopularMoviesPagination,
+                SearchAPIService,
+                DiscoverAPIService
+                >(),
+                imageAPIService: ImageAPIService(),
+                popularMoviesPersistence: PopularMoviesPersistence()
             )
         }
     }

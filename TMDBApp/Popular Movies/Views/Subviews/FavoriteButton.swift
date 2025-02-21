@@ -18,6 +18,7 @@ struct FavoriteButton: View {
         } label: {
             Image(systemName: data.isFavorite ? "star.fill" : "star")
                 .foregroundStyle(data.isFavorite ? Colors.selected : Colors.unselected)
+                .accessibilityIdentifier(AccessibilityIdentifiers.PopularMovies.favouriteButton)
         }
     }
 }
