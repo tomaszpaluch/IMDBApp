@@ -18,23 +18,23 @@
 - Make sure your code is testable
 - README explaining how to run the project
 - Extra tasks:
- - Unit tests
- - UI tests
- - Save Search Screen results in permanent storage
+    - Unit tests
+    - UI tests
+    - Save Search Screen results in permanent storage
 
 ## required tasks:
 - Popular Movies screen: It will be the first screen with a list of popular movies with pagination. From this screen the user can perform Search and toggle filtering of favourite movies. Show these fields:
- - title
- - posterImage(poster_path)
+    - title
+    - posterImage(poster_path)
 - Search: When user types search is automatically performed. Show these fields:
- - title
- - posterImage(poster_path)
+    - title
+    - posterImage(poster_path)
 - Movie Details screen: When user clicks on the movie item on the Popular Movies screen or in the Search, app should open Movie Details screen should consist of:
- - data already loaded on the previous screen (title, posterImage). Don't download it again on the details screen.
- - Additional data loaded with two concurrent network requests:
- - overview & release date
- - tappable label showing list of languages (spoken languages). After tapping thr label, a full list of languages should be displayed modally.
- - button to favourite / unfavourite the movie
+    - data already loaded on the previous screen (title, posterImage). Don't download it again on the details screen.
+    - additional data loaded with two concurrent network requests:
+        - overview & release date
+        - tappable label showing list of languages (spoken languages). After tapping thr label, a full list of languages should be displayed modally.
+        - button to favourite / unfavourite the movie
 
 ## requirements
 In order to compile and run this app you need to have a Mac running Mac OS Sequoia with Xcode 16.
