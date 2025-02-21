@@ -22,7 +22,7 @@
  - UI tests
  - Save Search Screen results in permanent storage
 
-## Required tasks:
+## required tasks:
 - Popular Movies screen: It will be the first screen with a list of popular movies with pagination. From this screen the user can perform Search and toggle filtering of favourite movies. Show these fields:
  - title
  - posterImage(poster_path)
